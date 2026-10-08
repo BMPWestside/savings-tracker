@@ -39,10 +39,10 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 #cards .card:last-child{margin-bottom:0}
 .card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:2px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
-.card.gold{background:#fdf0c4;color:#6b4a08}
-.card.savings{background:#dff3df;color:#1e5a28}
-.card.emergency{background:#fbdcdc;color:#8a1f1f}
-.card.travel{background:#dbe9fc;color:#0D2A5E}
+.card.gold{background:#f3dc8e;color:#5c3f05}
+.card.savings{background:#bfe3bf;color:#174a20}
+.card.emergency{background:#f2b8b8;color:#7a1818}
+.card.travel{background:#b4d1f5;color:#0D2A5E}
 .card.sel{box-shadow:0 0 0 4px var(--cyan)}
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
@@ -50,6 +50,14 @@ h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercas
 #hist{position:relative;border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
 #hist .e:last-child{margin-bottom:0}
+.e.gold{background:#f3dc8e;color:#5c3f05}
+.e.savings{background:#bfe3bf;color:#174a20}
+.e.emergency{background:#f2b8b8;color:#7a1818}
+.e.travel{background:#b4d1f5;color:#0D2A5E}
+.e.gold small,.e.savings small,.e.emergency small,.e.travel small{color:inherit;opacity:.75}
+.e.gold .inc,.e.savings .inc,.e.emergency .inc,.e.travel .inc{color:#14602a}
+.e.gold .exp,.e.savings .exp,.e.emergency .exp,.e.travel .exp{color:#a01818}
+.e.gold .del,.e.savings .del,.e.emergency .del,.e.travel .del{color:inherit;opacity:.7}
 .inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
 .del{border:0;background:none;color:var(--muted);font-size:22px;margin-left:8px;padding:0 4px}
 .panel{background:linear-gradient(180deg,#14306b,#0e2352);border:2px solid var(--gold);border-radius:28px;padding:16px}
@@ -138,7 +146,7 @@ function render(){
   const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
   if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
   $('ht').style.display='';$('ht').textContent=filter+' history';
-  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
+  $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
   fitHist();
 }
 function toggle(s){filter=filter===s?null:s;render();$('hist').scrollTop=0}
