@@ -21,8 +21,7 @@
 }
 *{box-sizing:border-box}
 html{min-height:100%;background:#0a1330;color-scheme:dark}
-.logo{display:block;margin:0 auto;object-fit:contain;background:none;height:auto;opacity:0;transition:opacity .25s;image-rendering:auto}
-.logo.ready{opacity:1}
+.logo{display:block;margin:0 auto;object-fit:contain;background:none;height:auto}
 .logo.big{width:min(270px,74vw)}
 .logo.sm{width:130px}
 html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
@@ -86,7 +85,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </div>
 </div>
 <div id="auth" class="panel">
-  <img class="logo big" src="icon-512.png" alt="Savings Tracker" style="margin-bottom:14px">
+  <img class="logo big" src="logo.png" alt="Savings Tracker" style="margin-bottom:14px">
   <b style="font-size:20px;color:#fff">Sign in</b>
   <p>Use your Google account to open the tracker.</p>
   <button class="save" id="signin" onclick="doSignIn()">Sign in with Google</button>
@@ -113,7 +112,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <button class="save" id="save" onclick="save()">Save entry</button>
     <div class="msg" id="msg"></div>
   </div>
-  <img class="logo sm" src="icon-512.png" alt="Savings Tracker" style="margin-top:28px">
+  <img class="logo sm" src="logo.png" alt="Savings Tracker" style="margin-top:28px">
 </div>
 
 <script src="config.js"></script>
@@ -254,36 +253,6 @@ function boot(){
   if(token)start();
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
-function clearLogoBg(img){
-  const show=()=>img.classList.add('ready');
-  const im=new Image();
-  im.onload=()=>{try{
-    const w=im.naturalWidth,h=im.naturalHeight;
-    const c=document.createElement('canvas');c.width=w;c.height=h;
-    const x=c.getContext('2d');x.drawImage(im,0,0);
-    const d=x.getImageData(0,0,w,h),a=d.data,rm=new Uint8Array(w*h),st=[];
-    const mn=i=>Math.min(a[i*4],a[i*4+1],a[i*4+2]);
-    const push=i=>{if(!rm[i]&&mn(i)>232){rm[i]=1;st.push(i)}};
-    for(let i=0;i<w;i++){push(i);push((h-1)*w+i)}
-    for(let j=0;j<h;j++){push(j*w);push(j*w+w-1)}
-    while(st.length){const i=st.pop(),px=i%w,py=(i/w)|0;
-      if(px>0)push(i-1);if(px<w-1)push(i+1);if(py>0)push(i-w);if(py<h-1)push(i+w)}
-    const near=(i,arr)=>{const px=i%w,py=(i/w)|0;
-      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=px+dx,Y=py+dy;
-        if(X>=0&&X<w&&Y>=0&&Y<h&&arr[Y*w+X])return true}return false};
-    const band=new Uint8Array(w*h);
-    for(let i=0;i<w*h;i++)if(!rm[i]&&near(i,rm))band[i]=1;
-    for(let i=0;i<w*h;i++)if(!rm[i]&&!band[i]&&near(i,band))band[i]=2;
-    for(let i=0;i<w*h;i++){
-      if(rm[i]){a[i*4+3]=0}
-      else if(band[i]){const m=mn(i);if(m>150){const al=Math.max(0,Math.min(1,(235-m)/85));a[i*4+3]=Math.round(al*255)}}
-    }
-    x.putImageData(d,0,0);
-    img.src=c.toDataURL('image/png');show();
-  }catch(e){img.src='icon-512.png';show()}};
-  im.onerror=show;
-  im.src='icon-512.png';
-}
 function fitHist(){
   const h=$('hist');h.style.maxHeight='';
   const r=h.querySelectorAll('.e');if(r.length<=4)return;
@@ -291,7 +260,6 @@ function fitHist(){
   h.style.maxHeight=(l.offsetTop+l.offsetHeight+7+4)+'px';
 }
 function init(){
-  document.querySelectorAll('img.logo').forEach(clearLogoBg);
   SECTIONS.forEach(s=>$('section').add(new Option(s,s)));  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
