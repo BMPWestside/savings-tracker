@@ -37,12 +37,17 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 #cards{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
-.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:2px solid var(--gold)}
+.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:3px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
 .card.gold{background:#f3dc8e;color:#5c3f05}
 .card.savings{background:#bfe3bf;color:#174a20}
 .card.emergency{background:#f2b8b8;color:#7a1818}
 .card.travel{background:#b4d1f5;color:#0D2A5E}
+.card.gold,.e.gold{border-color:#8a6410}
+.card.savings,.e.savings{border-color:#2d7a3b}
+.card.emergency,.e.emergency{border-color:#b02525}
+.card.travel,.e.travel{border-color:#1f5bb0}
+.e.gold,.e.savings,.e.emergency,.e.travel{border-width:3px}
 .card.sel{box-shadow:0 0 0 4px var(--cyan)}
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
