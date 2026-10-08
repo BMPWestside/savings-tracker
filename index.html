@@ -23,7 +23,7 @@
 html{min-height:100%;background:#0a1330;color-scheme:dark}
 .logo{display:block;margin:0 auto;object-fit:contain;background:none;height:auto}
 .logo.big{width:min(270px,74vw)}
-.logo.sm{width:130px}
+.logo.mono{width:auto;max-width:100%;height:130px}
 html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
 .top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0a1330 0,#0a1330 calc(100% - 14px),rgba(10,19,48,0) 100%);padding:calc(env(safe-area-inset-top,0px) + 56px) 0 14px;margin:0 -16px;padding-left:16px;padding-right:16px}
 .top header{margin-top:0}
@@ -39,7 +39,7 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 #cards{border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
-.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:13px 16px;border-radius:18px;margin-bottom:6px;font-weight:800;font-size:18px;border:2px solid var(--gold)}
+.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:15px 16px;border-radius:20px;margin-bottom:8px;font-weight:800;font-size:19px;border:2px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
 .card.gold{background:rgba(196,146,30,.42);color:#ffe08a}
 .card.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
@@ -51,8 +51,8 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .card.travel,.e.travel{border-color:#5aa9ff}
 .card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .card.sel{box-shadow:0 0 0 4px var(--gold)}
-h3{margin:8px 6px 5px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
-.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:14px;padding:7px 12px;margin-bottom:6px;font-size:13px}
+h3{margin:10px 6px 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 13px;margin-bottom:8px;font-size:14px}
 .e small{display:block;color:var(--muted);margin-top:1px;font-size:12px}
 #hist{position:relative;border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
@@ -117,6 +117,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
   <div id="cards"></div>
   <h3 id="ht">Recent entries</h3>
   <div id="hist"></div>
+  <img id="fl" class="logo mono" src="logo-sm.png" alt="Savings Tracker" style="margin-top:10px">
 </div>
 
 <div id="form" class="hide">
@@ -133,7 +134,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <button class="save" id="save" onclick="save()">Save entry</button>
     <div class="msg" id="msg"></div>
   </div>
-  <img class="logo sm" src="logo.png" alt="Savings Tracker" style="margin-top:12px">
+  <img class="logo mono" src="logo-sm.png" alt="Savings Tracker" style="margin-top:12px">
 </div>
 
 <div id="sheet" class="sheet hide">
@@ -176,7 +177,7 @@ function render(){
   const b=balances();
   $('cards').innerHTML=SECTIONS.map(s=>`<button class="card ${s.toLowerCase()} ${filter===s?'sel':''}" onclick="toggle('${s}')"><span>${s}</span><span class="amt">${money(b[s])}</span></button>`).join('');
   const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
-  if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
+  if(!filter){$('ht').style.display='none';$('hist').innerHTML='';fitLayout();return}
   $('ht').style.display='';$('ht').textContent=filter+' history'+(role==='owner'?' · tap an entry to edit':'');
   $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"${role==='owner'?` onclick="openEdit('${e.id}')" style="cursor:pointer"`:''}><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span></div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
   fitLayout();
@@ -326,29 +327,43 @@ function boot(){
   if(token)start();
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
-function reserve(){return(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))?24:90}
+function reserve(){return(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))?24:72}
 function fitHist(){
   const h=$('hist');h.style.maxHeight='';
   const r=h.querySelectorAll('.e');if(!r.length||!r[0].offsetHeight)return;
-  let max=1e9;
-  if(r.length>4){const l=r[3];max=l.offsetTop+l.offsetHeight+4+4}
   const top=h.getBoundingClientRect().top+window.scrollY;
   const avail=window.innerHeight-reserve()-top;
-  max=Math.max(Math.min(max,avail),90);
-  if(max<h.scrollHeight+4)h.style.maxHeight=max+'px';
+  let k=Math.min(r.length,4);
+  const need=n=>r[n-1].offsetTop+r[n-1].offsetHeight+6+4;
+  while(k>2&&need(k)>avail)k--;
+  if(r.length>k)h.style.maxHeight=need(k)+'px';
+  else if(need(k)>avail)h.style.maxHeight=Math.max(avail,90)+'px';
 }
 function fitLogo(){
   const g=document.querySelector('#form .logo');
-  if(!g||$('form').classList.contains('hide'))return;
-  g.style.display='';g.style.width='130px';
-  const top=g.getBoundingClientRect().top+window.scrollY;
-  const size=Math.min(130,window.innerHeight-reserve()-top-6);
-  if(size<44)g.style.display='none';else g.style.width=size+'px';
+  if(g&&!$('form').classList.contains('hide')){
+    g.style.display='';g.style.height='130px';
+    const top=g.getBoundingClientRect().top+window.scrollY;
+    const size=Math.min(130,window.innerHeight-reserve()-top-6);
+    if(size<44)g.style.display='none';else g.style.height=size+'px';
+  }
+  const f=$('fl');
+  if(f&&!$('funds').classList.contains('hide')){
+    if(filter){f.style.display='none';return}
+    f.style.display='';f.style.height='60px';
+    const top=f.getBoundingClientRect().top+window.scrollY;
+    const room=window.innerHeight-reserve()-top-6;
+    const aspect=(f.naturalWidth&&f.naturalHeight)?f.naturalWidth/f.naturalHeight:0.93;
+    const maxW=$('funds').getBoundingClientRect().width*0.9;
+    const size=Math.min(room,maxW/aspect);
+    if(size<60)f.style.display='none';else f.style.height=size+'px';
+  }
 }
 function fitLayout(){fitHist();fitLogo()}
 window.addEventListener('resize',fitLayout);
 window.addEventListener('orientationchange',()=>setTimeout(fitLayout,200));
 window.addEventListener('load',()=>setTimeout(fitLayout,100));
+['fl'].forEach(i=>{const e=document.getElementById(i);if(e)e.addEventListener('load',fitLayout)});
 function init(){
   SECTIONS.forEach(s=>{$('section').add(new Option(s,s));$('e_section').add(new Option(s,s))});  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
