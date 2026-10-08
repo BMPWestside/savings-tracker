@@ -10,7 +10,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Savings">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Savings Tracker</title>
 <style>
 :root{
@@ -21,8 +21,11 @@
 }
 *{box-sizing:border-box}
 html{min-height:100%;background:#0a1330;color-scheme:dark}
-.logo{display:block;margin:0 auto;object-fit:contain;background:none}
-html,body{overscroll-behavior-y:none}
+.logo{display:block;margin:0 auto;object-fit:contain;background:none;height:auto;opacity:0;transition:opacity .25s;image-rendering:auto}
+.logo.ready{opacity:1}
+.logo.big{width:min(270px,74vw)}
+.logo.sm{width:130px}
+html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
 .top{position:sticky;top:0;z-index:20;background:#0a1330;padding:calc(env(safe-area-inset-top,0px) + 56px) 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
 .top header{margin-top:0}
 .top .tabs{margin-bottom:0}
@@ -45,7 +48,7 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
 .e small{display:block;color:var(--muted);margin-top:2px}
-#hist{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#hist{position:relative;border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
 #hist .e:last-child{margin-bottom:0}
 .inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
@@ -83,7 +86,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </div>
 </div>
 <div id="auth" class="panel">
-  <img class="logo" src="icon-192.png" alt="" width="170" height="170" style="margin-bottom:14px">
+  <img class="logo big" src="icon-512.png" alt="Savings Tracker" style="margin-bottom:14px">
   <b style="font-size:20px;color:#fff">Sign in</b>
   <p>Use your Google account to open the tracker.</p>
   <button class="save" id="signin" onclick="doSignIn()">Sign in with Google</button>
@@ -110,7 +113,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <button class="save" id="save" onclick="save()">Save entry</button>
     <div class="msg" id="msg"></div>
   </div>
-  <img class="logo" src="icon-192.png" alt="" width="72" height="72" style="margin-top:28px">
+  <img class="logo sm" src="icon-512.png" alt="Savings Tracker" style="margin-top:28px">
 </div>
 
 <script src="config.js"></script>
@@ -125,6 +128,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 function tab(n){
   $('t1').classList.toggle('on',n===1);$('t2').classList.toggle('on',n===2);
   $('funds').classList.toggle('hide',n!==1);$('form').classList.toggle('hide',n!==2);
+  if(n===1)fitHist();
 }
 function setType(t){type=t;$('bi').className=t==='Income'?'on':'';$('bx').className=t==='Expense'?'on x':''}
 function balances(){const b={};SECTIONS.forEach(s=>b[s]=0);entries.forEach(e=>{if(e.section in b)b[e.section]+=e.type==='Income'?e.amount:-e.amount});return b}
@@ -136,8 +140,9 @@ function render(){
   if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
   $('ht').style.display='';$('ht').textContent=filter+' history';
   $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
+  fitHist();
 }
-function toggle(s){filter=filter===s?null:s;render()}
+function toggle(s){filter=filter===s?null:s;render();$('hist').scrollTop=0}
 function msg(t,c){$('msg').textContent=t;$('msg').className='msg '+(c||'')}
 
 function save(){
@@ -250,18 +255,40 @@ function boot(){
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
 function clearLogoBg(img){
-  const go=()=>{try{
-    const w=img.naturalWidth,h=img.naturalHeight;if(!w)return;
-    const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0);
-    const d=x.getImageData(0,0,w,h),a=d.data,seen=new Uint8Array(w*h),st=[];
-    const white=i=>a[i*4]>235&&a[i*4+1]>235&&a[i*4+2]>235;
-    const push=i=>{if(!seen[i]&&white(i)){seen[i]=1;st.push(i)}};
-    for(let i=0;i<w;i++){push(i);push((h-1)*w+i)}for(let j=0;j<h;j++){push(j*w);push(j*w+w-1)}
-    while(st.length){const i=st.pop(),px=i%w,py=(i/w)|0;a[i*4+3]=0;
+  const show=()=>img.classList.add('ready');
+  const im=new Image();
+  im.onload=()=>{try{
+    const w=im.naturalWidth,h=im.naturalHeight;
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const x=c.getContext('2d');x.drawImage(im,0,0);
+    const d=x.getImageData(0,0,w,h),a=d.data,rm=new Uint8Array(w*h),st=[];
+    const mn=i=>Math.min(a[i*4],a[i*4+1],a[i*4+2]);
+    const push=i=>{if(!rm[i]&&mn(i)>232){rm[i]=1;st.push(i)}};
+    for(let i=0;i<w;i++){push(i);push((h-1)*w+i)}
+    for(let j=0;j<h;j++){push(j*w);push(j*w+w-1)}
+    while(st.length){const i=st.pop(),px=i%w,py=(i/w)|0;
       if(px>0)push(i-1);if(px<w-1)push(i+1);if(py>0)push(i-w);if(py<h-1)push(i+w)}
-    x.putImageData(d,0,0);img.src=c.toDataURL('image/png');
-  }catch(e){}};
-  if(img.complete)go();else img.onload=go;
+    const near=(i,arr)=>{const px=i%w,py=(i/w)|0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=px+dx,Y=py+dy;
+        if(X>=0&&X<w&&Y>=0&&Y<h&&arr[Y*w+X])return true}return false};
+    const band=new Uint8Array(w*h);
+    for(let i=0;i<w*h;i++)if(!rm[i]&&near(i,rm))band[i]=1;
+    for(let i=0;i<w*h;i++)if(!rm[i]&&!band[i]&&near(i,band))band[i]=2;
+    for(let i=0;i<w*h;i++){
+      if(rm[i]){a[i*4+3]=0}
+      else if(band[i]){const m=mn(i);if(m>150){const al=Math.max(0,Math.min(1,(235-m)/85));a[i*4+3]=Math.round(al*255)}}
+    }
+    x.putImageData(d,0,0);
+    img.src=c.toDataURL('image/png');show();
+  }catch(e){img.src='icon-512.png';show()}};
+  im.onerror=show;
+  im.src='icon-512.png';
+}
+function fitHist(){
+  const h=$('hist');h.style.maxHeight='';
+  const r=h.querySelectorAll('.e');if(r.length<=4)return;
+  const l=r[3];if(!l.offsetHeight)return;
+  h.style.maxHeight=(l.offsetTop+l.offsetHeight+7+4)+'px';
 }
 function init(){
   document.querySelectorAll('img.logo').forEach(clearLogoBg);
