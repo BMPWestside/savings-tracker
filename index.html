@@ -21,8 +21,12 @@
 }
 *{box-sizing:border-box}
 html{min-height:100%;background:#0a1330;color-scheme:dark}
-.logo{display:block;margin:0 auto;border-radius:22%;background:#fff;object-fit:cover}
-body{margin:0 auto;max-width:560px;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.logo{display:block;margin:0 auto;object-fit:contain;background:none}
+html,body{overscroll-behavior-y:none}
+.top{position:sticky;top:0;z-index:20;background:#0a1330;padding:calc(env(safe-area-inset-top,0px) + 56px) 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.top header{margin-top:0}
+.top .tabs{margin-bottom:0}
+body{margin:0 auto;max-width:560px;min-height:100vh;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 header{margin:2px 0 8px;padding:8px 16px;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
 h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .rule{display:none}
@@ -71,17 +75,19 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </style>
 </head>
 <body class="locked">
+<div class="top">
 <header><h1>Savings Tracker</h1><div class="rule"></div></header>
+<div class="tabs">
+  <button id="t1" class="on" onclick="tab(1)">Funds</button>
+  <button id="t2" onclick="tab(2)">New Entry</button>
+</div>
+</div>
 <div id="auth" class="panel">
-  <img class="logo" src="icon-192.png" alt="" width="96" height="96" style="margin-bottom:14px">
+  <img class="logo" src="icon-192.png" alt="" width="170" height="170" style="margin-bottom:14px">
   <b style="font-size:20px;color:#fff">Sign in</b>
   <p>Use your Google account to open the tracker.</p>
   <button class="save" id="signin" onclick="doSignIn()">Sign in with Google</button>
   <div class="msg" id="amsg"></div>
-</div>
-<div class="tabs">
-  <button id="t1" class="on" onclick="tab(1)">Funds</button>
-  <button id="t2" onclick="tab(2)">New Entry</button>
 </div>
 
 <div id="funds">
@@ -243,7 +249,22 @@ function boot(){
   if(token)start();
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
+function clearLogoBg(img){
+  const go=()=>{try{
+    const w=img.naturalWidth,h=img.naturalHeight;if(!w)return;
+    const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0);
+    const d=x.getImageData(0,0,w,h),a=d.data,seen=new Uint8Array(w*h),st=[];
+    const white=i=>a[i*4]>235&&a[i*4+1]>235&&a[i*4+2]>235;
+    const push=i=>{if(!seen[i]&&white(i)){seen[i]=1;st.push(i)}};
+    for(let i=0;i<w;i++){push(i);push((h-1)*w+i)}for(let j=0;j<h;j++){push(j*w);push(j*w+w-1)}
+    while(st.length){const i=st.pop(),px=i%w,py=(i/w)|0;a[i*4+3]=0;
+      if(px>0)push(i-1);if(px<w-1)push(i+1);if(py>0)push(i-w);if(py<h-1)push(i+w)}
+    x.putImageData(d,0,0);img.src=c.toDataURL('image/png');
+  }catch(e){}};
+  if(img.complete)go();else img.onload=go;
+}
 function init(){
+  document.querySelectorAll('img.logo').forEach(clearLogoBg);
   SECTIONS.forEach(s=>$('section').add(new Option(s,s)));  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
