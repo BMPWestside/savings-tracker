@@ -124,9 +124,10 @@ function balances(){const b={};SECTIONS.forEach(s=>b[s]=0);entries.forEach(e=>{i
 function render(){
   const b=balances();
   $('cards').innerHTML=SECTIONS.map(s=>`<button class="card ${s.toLowerCase()} ${filter===s?'sel':''}" onclick="toggle('${s}')"><span>${s}</span><span class="amt">${money(b[s])}</span></button>`).join('');
-  const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0)).slice(0,40);
-  $('ht').textContent=filter?filter+' history':'Recent entries';
-  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.person?' · '+esc(e.person):''}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries yet. Tap New Entry to add one.</div>';
+  const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
+  if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
+  $('ht').style.display='';$('ht').textContent=filter+' history';
+  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.person?' · '+esc(e.person):''}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
 }
 function toggle(s){filter=filter===s?null:s;render()}
 function msg(t,c){$('msg').textContent=t;$('msg').className='msg '+(c||'')}
