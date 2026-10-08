@@ -49,7 +49,7 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .card.travel,.e.travel{border-color:#5aa9ff}
 .e.gold,.e.savings,.e.emergency,.e.travel{border-width:3px}
 .card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.card.sel{box-shadow:0 0 0 4px var(--cyan)}
+.card.sel{box-shadow:0 0 0 5px var(--gold)}
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
 .e small{display:block;color:var(--muted);margin-top:2px}
@@ -167,7 +167,7 @@ function save(){
   if(type==='Expense'&&amount>bal&&!confirm(section+' only has '+money(bal)+'. Save anyway?'))return;
   $('save').disabled=true;msg('Saving…');
   Promise.resolve(store.add({section,type,amount,date,person:'',desc:$('desc').value.trim()})).then(()=>{
-    $('amount').value='';$('desc').value='';$('save').disabled=false;msg('Saved ✓','ok');
+    $('amount').value='';$('desc').value='';$('section').value='';$('save').disabled=false;msg('Saved ✓','ok');
     setTimeout(()=>{msg('');tab(1)},500);
   }).catch(e=>{$('save').disabled=false;msg('Could not save: '+(e&&e.message||'try again'),'err')});
 }
