@@ -14,14 +14,14 @@
 <title>Savings Tracker</title>
 <style>
 :root{
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
   --cobalt:#0D2A5E;--cyan:#1FA6E0;--gold:#D4B26D;--gold2:#e6cf9c;
   --ink:#eef2ff;--muted:#b3c1ea;--field:#112553;--line:#D4B26D;
   --pos:#5fd08a;--neg:#ff8a80;
 }
 *{box-sizing:border-box}
-html{min-height:100%;background:linear-gradient(180deg,#10224f 0%,#0a1330 35%,#060a1c 100%) fixed;color-scheme:dark}
-body{margin:0 auto;max-width:560px;min-height:100vh;padding:16px;color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+html{min-height:100%;background-color:#0a1330;background-image:linear-gradient(180deg,#10224f 0%,#0a1330 35%,#0a1330 100%);background-attachment:fixed;color-scheme:dark}
+body{margin:0 auto;max-width:560px;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 header{margin:2px 0 8px;padding:8px 16px;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
 h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .rule{display:none}
@@ -103,7 +103,6 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <div class="msg" id="msg"></div>
   </div>
 </div>
-<div class="foot">Balance = income − expenses · <a href="#" onclick="signOut();return false" style="color:inherit">Sign out</a></div>
 
 <script src="config.js"></script>
 <script>
