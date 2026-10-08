@@ -1,0 +1,80 @@
+// ====== EDIT THESE TWO ======
+const OWNER  = 'bmpwestside@gmail.com';   // full access (add / delete)
+const VIEWER = 'WIFE_EMAIL@gmail.com';     // view-only, Funds tab only
+// ============================
+
+const SECTIONS = ['Gold', 'Savings', 'Emergency', 'Travel'];
+const TAB = 'Entries';
+const HEADERS = ['ID', 'Date', 'Section', 'Type', 'Amount', 'Description', 'Timestamp'];
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('Savings Tracker')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function role_() {
+  const me = (Session.getActiveUser().getEmail() || '').toLowerCase();
+  if (me === OWNER.toLowerCase()) return 'owner';
+  if (me === VIEWER.toLowerCase()) return 'viewer';
+  throw new Error('No access for this account');
+}
+
+// Run ONCE from the editor while signed in as the owner. Creates the sheet in the owner's Drive.
+function setup() {
+  if (role_() !== 'owner') throw new Error('Run setup as the owner');
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty('SHEET_ID')) { Logger.log('Already set up: ' + SpreadsheetApp.openById(props.getProperty('SHEET_ID')).getUrl()); return; }
+  const ss = SpreadsheetApp.create('Savings Tracker Data');
+  const sh = ss.getSheets()[0].setName(TAB);
+  sh.appendRow(HEADERS);
+  sh.setFrozenRows(1);
+  sh.getRange('B:B').setNumberFormat('@');
+  props.setProperty('SHEET_ID', ss.getId());
+  Logger.log('Sheet created: ' + ss.getUrl() + '  (share it with the viewer as "Viewer")');
+}
+
+function sheet_() {
+  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  if (!id) throw new Error('Owner must run setup() once');
+  return SpreadsheetApp.openById(id).getSheetByName(TAB);
+}
+
+function getData() {
+  const role = role_();
+  const rows = sheet_().getDataRange().getValues().slice(1);
+  const entries = rows.map(r => ({
+    id: String(r[0]), date: String(r[1]), section: r[2], type: r[3],
+    amount: Number(r[4]), desc: r[5], ts: Number(r[6]) || 0
+  }));
+  return { role, entries };
+}
+
+function addEntry(e) {
+  if (role_() !== 'owner') throw new Error('View only');
+  const amount = Math.round(Number(e.amount) * 100) / 100;
+  if (!SECTIONS.includes(e.section)) throw new Error('Choose a section');
+  if (!(amount > 0)) throw new Error('Enter an amount above 0');
+  if (!['Income', 'Expense'].includes(e.type)) throw new Error('Choose a type');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) throw new Error('Invalid date');
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    sheet_().appendRow([Utilities.getUuid(), e.date, e.section, e.type, amount,
+      String(e.desc || '').slice(0, 120), Date.now()]);
+  } finally { lock.releaseLock(); }
+  return getData();
+}
+
+function deleteEntry(id) {
+  if (role_() !== 'owner') throw new Error('View only');
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sh = sheet_();
+    const ids = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().flat();
+    const i = ids.indexOf(id);
+    if (i > 0) sh.deleteRow(i + 1);
+  } finally { lock.releaseLock(); }
+  return getData();
+}

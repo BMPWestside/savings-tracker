@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#0a1330">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Savings">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Savings Tracker</title>
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --cobalt:#0D2A5E;--cyan:#1FA6E0;--gold:#D4B26D;--gold2:#e6cf9c;
+  --ink:#eef2ff;--muted:#b3c1ea;--field:#112553;--line:#D4B26D;
+  --pos:#5fd08a;--neg:#ff8a80;
+}
+*{box-sizing:border-box}
+html{min-height:100%;background:linear-gradient(180deg,#10224f 0%,#0a1330 35%,#060a1c 100%) fixed;color-scheme:dark}
+body{margin:0 auto;max-width:560px;min-height:100vh;padding:16px;color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{margin:2px 0 8px;padding:8px 16px;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
+.rule{display:none}
+.tabs{display:flex;border-radius:999px;border:2px solid var(--gold);padding:3px;margin-bottom:12px;background:rgba(13,42,94,.6)}
+.tabs button{flex:1;border:2px solid transparent;background:none;padding:8px;border-radius:999px;font-size:16px;font-weight:800;color:var(--muted)}
+.tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+#cards{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352)}
+#cards .card:last-child{margin-bottom:0}
+.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:2px solid var(--gold)}
+.card .amt{font-variant-numeric:tabular-nums}
+.card.gold{background:#fdf0c4;color:#6b4a08}
+.card.savings{background:#dff3df;color:#1e5a28}
+.card.emergency{background:#fbdcdc;color:#8a1f1f}
+.card.travel{background:#dbe9fc;color:#0D2A5E}
+.card.sel{box-shadow:0 0 0 4px var(--cyan)}
+h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
+.e small{display:block;color:var(--muted);margin-top:2px}
+.inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
+.del{border:0;background:none;color:var(--muted);font-size:22px;margin-left:8px;padding:0 4px}
+.panel{background:linear-gradient(180deg,#14306b,#0e2352);border:2px solid var(--gold);border-radius:28px;padding:16px}
+.ph{display:flex;justify-content:space-between;align-items:baseline}.ph b{font-size:20px;color:#fff}.ph span{font-size:12px;color:var(--muted);font-weight:700}
+label{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:14px 6px 6px}
+input,select{width:100%;height:48px;min-width:0;display:block;-webkit-appearance:none;appearance:none;padding:0 16px;font-size:16px;border:2px solid var(--gold);border-radius:999px;background:var(--field);color:var(--ink);font-family:inherit}
+input::placeholder{color:#8da0d6}
+input[type=date]{text-align:left;line-height:48px}
+input:focus,select:focus{outline:3px solid var(--cyan)}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+.seg{display:flex;gap:10px}
+.seg button{flex:1;padding:13px;font-size:16px;font-weight:800;border:2px solid var(--gold);background:var(--field);border-radius:999px;color:var(--muted)}
+.seg button.on,.seg button.on.x{background:linear-gradient(135deg,#4aa8e0,var(--cyan));color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.save{width:100%;margin-top:18px;padding:15px;font-size:20px;font-weight:900;color:var(--cobalt);border:0;border-radius:999px;background:linear-gradient(135deg,#e2c586,var(--gold))}
+.save:disabled{opacity:.6}
+.msg{text-align:center;margin-top:10px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
+.empty{text-align:center;color:var(--muted);padding:14px;font-size:14px}
+.hide{display:none}
+.foot{text-align:center;color:var(--muted);opacity:.7;font-size:12px;margin:18px 0 4px}
+#auth{display:none;text-align:center}
+#auth p{color:var(--muted);margin:10px 0 0;font-size:14px}
+.locked #auth{display:block}
+.locked .tabs,.locked #funds,.locked #form,.locked .foot{display:none}
+#mode.tap{cursor:pointer;color:var(--gold);text-decoration:underline}
+</style>
+</head>
+<body class="locked">
+<header><h1>Savings Tracker</h1><div class="rule"></div></header>
+<div id="auth" class="panel">
+  <b style="font-size:20px;color:#fff">Sign in</b>
+  <p>Use your Google account to open the tracker.</p>
+  <button class="save" id="signin" onclick="doSignIn()">Sign in with Google</button>
+  <div class="msg" id="amsg"></div>
+</div>
+<div class="tabs">
+  <button id="t1" class="on" onclick="tab(1)">Funds</button>
+  <button id="t2" onclick="tab(2)">New Entry</button>
+</div>
+
+<div id="funds">
+  <div id="cards"></div>
+  <h3 id="ht">Recent entries</h3>
+  <div id="hist"></div>
+</div>
+
+<div id="form" class="hide">
+  <div class="panel">
+    <div class="ph"><b>New entry</b><span id="mode"></span></div>
+    <div class="row">
+      <div><label>Section</label><select id="section"><option value="">Choose section</option></select></div>
+      <div><label>Amount (AUD)</label><input id="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div>
+    </div>
+    <label>Type</label>
+    <div class="seg"><button id="bi" class="on" onclick="setType('Income')">Income</button><button id="bx" onclick="setType('Expense')">Expense</button></div>
+    <label>Person</label><select id="person"></select>
+    <label>Date</label><input id="date" type="date">
+    <label>Description</label><input id="desc" placeholder="Optional" maxlength="120">
+    <button class="save" id="save" onclick="save()">Save entry</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+<div class="foot">Balance = income − expenses · <a href="#" onclick="signOut();return false" style="color:inherit">Sign out</a></div>
+
+<script src="config.js"></script>
+<script>
+const SECTIONS=['Gold','Savings','Emergency','Travel'];
+const PEOPLE=['SM','DM'];
+let entries=[],type='Income',filter=null,store=null,role='';
+const $=id=>document.getElementById(id);
+const money=n=>'AUD '+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fdate=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})};
+const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function tab(n){
+  $('t1').classList.toggle('on',n===1);$('t2').classList.toggle('on',n===2);
+  $('funds').classList.toggle('hide',n!==1);$('form').classList.toggle('hide',n!==2);
+}
+function setType(t){type=t;$('bi').className=t==='Income'?'on':'';$('bx').className=t==='Expense'?'on x':''}
+function balances(){const b={};SECTIONS.forEach(s=>b[s]=0);entries.forEach(e=>{if(e.section in b)b[e.section]+=e.type==='Income'?e.amount:-e.amount});return b}
+
+function render(){
+  const b=balances();
+  $('cards').innerHTML=SECTIONS.map(s=>`<button class="card ${s.toLowerCase()} ${filter===s?'sel':''}" onclick="toggle('${s}')"><span>${s}</span><span class="amt">${money(b[s])}</span></button>`).join('');
+  const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0)).slice(0,40);
+  $('ht').textContent=filter?filter+' history':'Recent entries';
+  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.person?' · '+esc(e.person):''}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries yet. Tap New Entry to add one.</div>';
+}
+function toggle(s){filter=filter===s?null:s;render()}
+function msg(t,c){$('msg').textContent=t;$('msg').className='msg '+(c||'')}
+
+function save(){
+  const amount=Math.round(parseFloat($('amount').value)*100)/100,section=$('section').value,date=$('date').value;
+  if(!section)return msg('Choose a section','err');
+  if(!(amount>0))return msg('Enter an amount above 0','err');
+  if(!date)return msg('Pick a date','err');
+  const bal=balances()[section];
+  if(type==='Expense'&&amount>bal&&!confirm(section+' only has '+money(bal)+'. Save anyway?'))return;
+  $('save').disabled=true;msg('Saving…');
+  Promise.resolve(store.add({section,type,amount,date,person:$('person').value,desc:$('desc').value.trim()})).then(()=>{
+    $('amount').value='';$('desc').value='';$('save').disabled=false;msg('Saved ✓','ok');
+    setTimeout(()=>{msg('');tab(1)},500);
+  }).catch(e=>{$('save').disabled=false;msg('Could not save: '+(e&&e.message||'try again'),'err')});
+}
+function del(id){if(confirm('Delete this entry?'))Promise.resolve(store.del(id)).catch(()=>alert('Could not delete'))}
+
+/* Storage: Google Sheets API (OAuth via Google Identity Services) */
+const C=window.APP_CONFIG,L=localStorage,enc=encodeURIComponent;
+const API='https://sheets.googleapis.com/v4/spreadsheets/'+C.SHEET_ID;
+const SCOPE='https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email';
+let token=null,email=L.getItem('st_email')||'',tc=null;
+try{const t=JSON.parse(L.getItem('st_token')||'null');if(t&&t.exp>Date.now()+60000)token=t.v}catch(e){}
+try{entries=JSON.parse(L.getItem('st_cache')||'[]')}catch(e){}
+role=L.getItem('st_role')||'';
+
+function gisReady(){tc=google.accounts.oauth2.initTokenClient({client_id:C.CLIENT_ID,scope:SCOPE,callback:()=>{}});boot()}
+function signIn(){return new Promise((res,rej)=>{
+  if(!tc)return rej(new Error('Google sign-in not loaded'));
+  tc.callback=r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;
+    L.setItem('st_token',JSON.stringify({v:token,exp:Date.now()+(r.expires_in-60)*1000}));res(token)};
+  tc.error_callback=e=>rej(new Error(e.type==='popup_closed'?'Sign-in cancelled':'Sign-in blocked'));
+  const o={prompt:email?'':'select_account'};if(email)o.login_hint=email;tc.requestAccessToken(o);
+})}
+const tok=()=>token?Promise.resolve(token):signIn();
+
+async function api(path,opt={}){
+  const r=await fetch(API+path,{...opt,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}});
+  if(r.status===401){token=null;L.removeItem('st_token');throw new Error('Session expired. Tap to reconnect.')}
+  if(!r.ok){let m='Request failed';try{m=(await r.json()).error.message}catch(e){}throw new Error(m)}
+  return r.json();
+}
+/* Sheet layout: tab "Entries", data table headers in row 15, entries from row 16.
+   Columns: A Date | B Person | C Section | D Type | E Amount | F Description */
+const FIRST=16;
+function toISO(v){
+  if(typeof v==='number'){return new Date(Date.UTC(1899,11,30)+Math.round(v)*864e5).toISOString().slice(0,10)}
+  const s=String(v||'').trim();let m;
+  if(m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  return s;
+}
+async function readRows(){
+  const d=await api('/values/'+enc('Entries!A'+FIRST+':F')+'?valueRenderOption=UNFORMATTED_VALUE');
+  return d.values||[];
+}
+async function fetchEntries(){
+  const rows=await readRows();
+  entries=[];
+  rows.forEach((r,i)=>{
+    const section=String(r[2]||'').trim(),type=String(r[3]||'').trim(),amount=Number(r[4]);
+    if(!section||!type||!(amount>=0))return;
+    entries.push({id:String(FIRST+i),row:FIRST+i,date:toISO(r[0]),person:String(r[1]||''),section,type,amount,desc:String(r[5]||''),ts:FIRST+i});
+  });
+  L.setItem('st_cache',JSON.stringify(entries));render();
+}
+store={
+  add:async e=>{await tok();
+    const n=FIRST+(await readRows()).length;
+    await api('/values/'+enc('Entries!A'+n+':F'+n)+'?valueInputOption=USER_ENTERED',{method:'PUT',body:JSON.stringify({values:[[e.date,e.person,e.section,e.type,e.amount,e.desc]]})});
+    await fetchEntries()},
+  del:async id=>{await tok();
+    const old=entries.find(x=>x.id===id);if(!old)return;
+    const rows=await readRows(),r=rows[old.row-FIRST]||[];
+    if(String(r[2]||'').trim()!==old.section||Number(r[4])!==old.amount){await fetchEntries();throw new Error('Sheet changed, reloaded')}
+    const m=await api('?fields=sheets.properties');const sid=m.sheets.find(s=>s.properties.title==='Entries').properties.sheetId;
+    await api(':batchUpdate',{method:'POST',body:JSON.stringify({requests:[{deleteDimension:{range:{sheetId:sid,dimension:'ROWS',startIndex:old.row-1,endIndex:old.row}}}]})});
+    await fetchEntries()}
+};
+
+function applyRole(){
+  $('mode').className='';$('mode').onclick=null;
+  $('mode').textContent=role==='owner'?'':'View only';
+  $('t2').classList.toggle('hide',role!=='owner');
+  if(role!=='owner')tab(1);
+}
+function reconnectBanner(){$('mode').textContent='Tap to reconnect';$('mode').className='tap';$('mode').onclick=async()=>{try{await signIn();await start()}catch(e){}}}
+
+async function start(){
+  if(!email||!role){
+    const u=await (await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+token}})).json();
+    email=(u.email||'').toLowerCase();
+    role=email===C.OWNER.toLowerCase()?'owner':C.VIEWERS.map(x=>x.toLowerCase()).includes(email)?'viewer':'none';
+    L.setItem('st_email',email);L.setItem('st_role',role);
+  }
+  if(role==='none'){const m='No access for '+email;signOut();$('amsg').textContent=m;$('amsg').className='msg err';return}
+  document.body.classList.remove('locked');applyRole();
+  try{await fetchEntries()}catch(e){reconnectBanner()}
+}
+async function doSignIn(){
+  $('amsg').textContent='';$('amsg').className='msg';
+  try{await signIn();await start()}catch(e){$('amsg').textContent=e.message;$('amsg').className='msg err'}
+}
+function signOut(){
+  try{if(token)google.accounts.oauth2.revoke(token)}catch(e){}
+  ['st_token','st_email','st_role','st_cache'].forEach(k=>L.removeItem(k));
+  token=null;email='';role='';entries=[];document.body.classList.add('locked');render();
+}
+function boot(){
+  if(token)start();
+  else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
+}
+function init(){
+  SECTIONS.forEach(s=>$('section').add(new Option(s,s)));
+  PEOPLE.forEach(p=>$('person').add(new Option(p,p)));
+  $('date').value=today();render();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+}
+init();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="gisReady()"></script>
+</body>
+</html>
