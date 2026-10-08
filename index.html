@@ -29,9 +29,11 @@ html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size
 .top header{margin-top:0}
 .top .tabs{margin-bottom:0}
 body{margin:0 auto;max-width:560px;min-height:100vh;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-header{margin:2px 0 8px;padding:8px 16px;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+header{margin:2px 0 8px;padding:5px 7px;display:grid;grid-template-columns:34px 1fr 34px;align-items:center;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
 h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .rule{display:none}
+.pb{width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;letter-spacing:.5px;color:var(--gold);background:rgba(13,42,94,.55);opacity:.32;transition:opacity .25s,box-shadow .25s,background .25s}
+.pb.on{opacity:1;color:#fff;background:linear-gradient(135deg,#e2c586,#b9923f);color:#0D2A5E;box-shadow:0 0 10px rgba(212,178,109,.65)}
 .tabs{display:flex;border-radius:999px;border:2px solid var(--gold);padding:3px;margin-bottom:12px;background:rgba(13,42,94,.6)}
 .tabs button{flex:1;border:2px solid transparent;background:none;padding:8px;border-radius:999px;font-size:16px;font-weight:800;color:var(--muted)}
 .tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
@@ -81,10 +83,10 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 .msg{text-align:center;margin-top:10px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
 .empty{text-align:center;color:var(--muted);padding:14px;font-size:14px}
 .hide{display:none}
-.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(env(safe-area-inset-bottom,0px) + 12px)}
 .sheet.hide{display:none}
 .sheet-bg{position:absolute;inset:0;background:rgba(3,8,24,.65)}
-.sheet-box{position:relative;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(180deg,#14306b,#0e2352)}
+.sheet-box{position:relative;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;border-radius:28px;padding-bottom:18px;background:linear-gradient(180deg,#14306b,#0e2352)}
 .btn2{width:100%;margin-top:10px;padding:13px;font-size:16px;font-weight:800;border-radius:999px;border:2px solid var(--gold);background:var(--field);color:var(--ink)}
 .btn2.danger{color:var(--neg);border-color:var(--neg)}
 .foot{text-align:center;color:var(--muted);opacity:.7;font-size:12px;margin:18px 0 4px}
@@ -97,7 +99,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </head>
 <body class="locked">
 <div class="top">
-<header><h1>Savings Tracker</h1><div class="rule"></div></header>
+<header><span class="pb" id="pSM">SM</span><h1>Savings Tracker</h1><span class="pb" id="pDM">DM</span><div class="rule"></div></header>
 <div class="tabs">
   <button id="t1" class="on" onclick="tab(1)">Funds</button>
   <button id="t2" onclick="tab(2)">New Entry</button>
@@ -290,7 +292,9 @@ store={
     await fetchEntries()}
 };
 
+function setBadges(){$('pSM').classList.toggle('on',role==='owner');$('pDM').classList.toggle('on',role==='viewer')}
 function applyRole(){
+  setBadges();
   $('mode').className='';$('mode').onclick=null;
   $('mode').textContent=role==='owner'?'':'View only';
   $('t2').classList.toggle('hide',role!=='owner');
@@ -316,7 +320,7 @@ async function doSignIn(){
 function signOut(){
   try{if(token)google.accounts.oauth2.revoke(token)}catch(e){}
   ['st_token','st_email','st_role','st_cache'].forEach(k=>L.removeItem(k));
-  token=null;email='';role='';entries=[];document.body.classList.add('locked');render();
+  token=null;email='';role='';entries=[];setBadges();document.body.classList.add('locked');render();
 }
 function boot(){
   if(token)start();
