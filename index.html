@@ -25,7 +25,7 @@ html{min-height:100%;background:#0a1330;color-scheme:dark}
 .logo.big{width:min(270px,74vw)}
 .logo.sm{width:130px}
 html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
-.top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0a1330 0,#0a1330 calc(100% - 20px),rgba(10,19,48,0) 100%);padding:calc(env(safe-area-inset-top,0px) + 56px) 0 20px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0a1330 0,#0a1330 calc(100% - 14px),rgba(10,19,48,0) 100%);padding:calc(env(safe-area-inset-top,0px) + 56px) 0 14px;margin:0 -16px;padding-left:16px;padding-right:16px}
 .top header{margin-top:0}
 .top .tabs{margin-bottom:0}
 body{margin:0 auto;max-width:560px;min-height:100vh;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
@@ -37,9 +37,9 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs{display:flex;border-radius:999px;border:2px solid var(--gold);padding:3px;margin-bottom:12px;background:rgba(13,42,94,.6)}
 .tabs button{flex:1;border:2px solid transparent;background:none;padding:8px;border-radius:999px;font-size:16px;font-weight:800;color:var(--muted)}
 .tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
-#cards{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352)}
+#cards{border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
-.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:2px solid var(--gold)}
+.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:13px 16px;border-radius:18px;margin-bottom:6px;font-weight:800;font-size:18px;border:2px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
 .card.gold{background:rgba(196,146,30,.42);color:#ffe08a}
 .card.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
@@ -51,10 +51,10 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .card.travel,.e.travel{border-color:#5aa9ff}
 .card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .card.sel{box-shadow:0 0 0 4px var(--gold)}
-h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
-.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
-.e small{display:block;color:var(--muted);margin-top:2px}
-#hist{position:relative;border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+h3{margin:8px 6px 5px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:14px;padding:7px 12px;margin-bottom:6px;font-size:13px}
+.e small{display:block;color:var(--muted);margin-top:1px;font-size:12px}
+#hist{position:relative;border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
 #hist .e:last-child{margin-bottom:0}
 .e.gold{background:rgba(196,146,30,.42);color:#ffe08a}
@@ -67,20 +67,20 @@ h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercas
 .e.gold .del,.e.savings .del,.e.emergency .del,.e.travel .del{color:inherit;opacity:.7}
 .inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
 .del{border:0;background:none;color:var(--muted);font-size:22px;margin-left:8px;padding:0 4px}
-.panel{background:linear-gradient(180deg,#14306b,#0e2352);border:2px solid var(--gold);border-radius:28px;padding:16px}
+.panel{background:linear-gradient(180deg,#14306b,#0e2352);border:2px solid var(--gold);border-radius:26px;padding:14px}
 .ph{display:flex;justify-content:space-between;align-items:baseline}.ph b{font-size:20px;color:#fff}.ph span{font-size:12px;color:var(--muted);font-weight:700}
-label{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:14px 6px 6px}
-input,select{width:100%;height:48px;min-width:0;display:block;-webkit-appearance:none;appearance:none;padding:0 16px;font-size:16px;border:2px solid var(--gold);border-radius:999px;background:var(--field);color:var(--ink);font-family:inherit}
+label{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:8px 6px 4px}
+input,select{width:100%;height:42px;min-width:0;display:block;-webkit-appearance:none;appearance:none;padding:0 16px;font-size:16px;border:2px solid var(--gold);border-radius:999px;background:var(--field);color:var(--ink);font-family:inherit}
 input::placeholder{color:#8da0d6}
-input[type=date]{text-align:left;line-height:48px}
+input[type=date]{text-align:left;line-height:42px}
 input:focus,select:focus{outline:3px solid var(--cyan)}
 .row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
 .seg{display:flex;gap:10px}
-.seg button{flex:1;padding:13px;font-size:16px;font-weight:800;border:2px solid var(--gold);background:var(--field);border-radius:999px;color:var(--muted)}
+.seg button{flex:1;padding:10px;font-size:16px;font-weight:800;border:2px solid var(--gold);background:var(--field);border-radius:999px;color:var(--muted)}
 .seg button.on,.seg button.on.x{background:linear-gradient(135deg,#4aa8e0,var(--cyan));color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
-.save{width:100%;margin-top:18px;padding:15px;font-size:20px;font-weight:900;color:var(--cobalt);border:0;border-radius:999px;background:linear-gradient(135deg,#e2c586,var(--gold))}
+.save{width:100%;margin-top:12px;padding:12px;font-size:18px;font-weight:900;color:var(--cobalt);border:0;border-radius:999px;background:linear-gradient(135deg,#e2c586,var(--gold))}
 .save:disabled{opacity:.6}
-.msg{text-align:center;margin-top:10px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
+.msg{text-align:center;margin-top:6px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
 .empty{text-align:center;color:var(--muted);padding:14px;font-size:14px}
 .hide{display:none}
 .sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(env(safe-area-inset-bottom,0px) + 12px)}
@@ -133,7 +133,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <button class="save" id="save" onclick="save()">Save entry</button>
     <div class="msg" id="msg"></div>
   </div>
-  <img class="logo sm" src="logo.png" alt="Savings Tracker" style="margin-top:28px">
+  <img class="logo sm" src="logo.png" alt="Savings Tracker" style="margin-top:12px">
 </div>
 
 <div id="sheet" class="sheet hide">
@@ -167,7 +167,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 function tab(n){
   $('t1').classList.toggle('on',n===1);$('t2').classList.toggle('on',n===2);
   $('funds').classList.toggle('hide',n!==1);$('form').classList.toggle('hide',n!==2);
-  if(n===1)fitHist();
+  fitLayout();
 }
 function setType(t){type=t;$('bi').className=t==='Income'?'on':'';$('bx').className=t==='Expense'?'on x':''}
 function balances(){const b={};SECTIONS.forEach(s=>b[s]=0);entries.forEach(e=>{if(e.section in b)b[e.section]+=e.type==='Income'?e.amount:-e.amount});return b}
@@ -179,7 +179,7 @@ function render(){
   if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
   $('ht').style.display='';$('ht').textContent=filter+' history'+(role==='owner'?' · tap an entry to edit':'');
   $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"${role==='owner'?` onclick="openEdit('${e.id}')" style="cursor:pointer"`:''}><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span></div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
-  fitHist();
+  fitLayout();
 }
 function toggle(s){filter=filter===s?null:s;render();$('hist').scrollTop=0}
 function msg(t,c){$('msg').textContent=t;$('msg').className='msg '+(c||'')}
@@ -326,12 +326,29 @@ function boot(){
   if(token)start();
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
+function reserve(){return(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))?24:90}
 function fitHist(){
   const h=$('hist');h.style.maxHeight='';
-  const r=h.querySelectorAll('.e');if(r.length<=4)return;
-  const l=r[3];if(!l.offsetHeight)return;
-  h.style.maxHeight=(l.offsetTop+l.offsetHeight+7+4)+'px';
+  const r=h.querySelectorAll('.e');if(!r.length||!r[0].offsetHeight)return;
+  let max=1e9;
+  if(r.length>4){const l=r[3];max=l.offsetTop+l.offsetHeight+4+4}
+  const top=h.getBoundingClientRect().top+window.scrollY;
+  const avail=window.innerHeight-reserve()-top;
+  max=Math.max(Math.min(max,avail),90);
+  if(max<h.scrollHeight+4)h.style.maxHeight=max+'px';
 }
+function fitLogo(){
+  const g=document.querySelector('#form .logo');
+  if(!g||$('form').classList.contains('hide'))return;
+  g.style.display='';g.style.width='130px';
+  const top=g.getBoundingClientRect().top+window.scrollY;
+  const size=Math.min(130,window.innerHeight-reserve()-top-6);
+  if(size<44)g.style.display='none';else g.style.width=size+'px';
+}
+function fitLayout(){fitHist();fitLogo()}
+window.addEventListener('resize',fitLayout);
+window.addEventListener('orientationchange',()=>setTimeout(fitLayout,200));
+window.addEventListener('load',()=>setTimeout(fitLayout,100));
 function init(){
   SECTIONS.forEach(s=>{$('section').add(new Option(s,s));$('e_section').add(new Option(s,s))});  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
