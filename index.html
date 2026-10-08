@@ -40,6 +40,9 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
 .e small{display:block;color:var(--muted);margin-top:2px}
+#hist{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#hist:empty{display:none}
+#hist .e:last-child{margin-bottom:0}
 .inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
 .del{border:0;background:none;color:var(--muted);font-size:22px;margin-left:8px;padding:0 4px}
 .panel{background:linear-gradient(180deg,#14306b,#0e2352);border:2px solid var(--gold);border-radius:28px;padding:16px}
@@ -94,7 +97,6 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     </div>
     <label>Type</label>
     <div class="seg"><button id="bi" class="on" onclick="setType('Income')">Income</button><button id="bx" onclick="setType('Expense')">Expense</button></div>
-    <label>Person</label><select id="person"></select>
     <label>Date</label><input id="date" type="date">
     <label>Description</label><input id="desc" placeholder="Optional" maxlength="120">
     <button class="save" id="save" onclick="save()">Save entry</button>
@@ -105,9 +107,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 
 <script src="config.js"></script>
 <script>
-const SECTIONS=['Gold','Savings','Emergency','Travel'];
-const PEOPLE=['SM','DM'];
-let entries=[],type='Income',filter=null,store=null,role='';
+const SECTIONS=['Gold','Savings','Emergency','Travel'];let entries=[],type='Income',filter=null,store=null,role='';
 const $=id=>document.getElementById(id);
 const money=n=>'AUD '+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fdate=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})};
@@ -127,7 +127,7 @@ function render(){
   const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
   if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
   $('ht').style.display='';$('ht').textContent=filter+' history';
-  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.person?' · '+esc(e.person):''}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
+  $('hist').innerHTML=list.length?list.map(e=>`<div class="e"><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
 }
 function toggle(s){filter=filter===s?null:s;render()}
 function msg(t,c){$('msg').textContent=t;$('msg').className='msg '+(c||'')}
@@ -140,7 +140,7 @@ function save(){
   const bal=balances()[section];
   if(type==='Expense'&&amount>bal&&!confirm(section+' only has '+money(bal)+'. Save anyway?'))return;
   $('save').disabled=true;msg('Saving…');
-  Promise.resolve(store.add({section,type,amount,date,person:$('person').value,desc:$('desc').value.trim()})).then(()=>{
+  Promise.resolve(store.add({section,type,amount,date,person:'',desc:$('desc').value.trim()})).then(()=>{
     $('amount').value='';$('desc').value='';$('save').disabled=false;msg('Saved ✓','ok');
     setTimeout(()=>{msg('');tab(1)},500);
   }).catch(e=>{$('save').disabled=false;msg('Could not save: '+(e&&e.message||'try again'),'err')});
@@ -242,9 +242,7 @@ function boot(){
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
 function init(){
-  SECTIONS.forEach(s=>$('section').add(new Option(s,s)));
-  PEOPLE.forEach(p=>$('person').add(new Option(p,p)));
-  $('date').value=today();render();
+  SECTIONS.forEach(s=>$('section').add(new Option(s,s)));  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 }
