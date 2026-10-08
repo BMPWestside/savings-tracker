@@ -37,7 +37,7 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs button.on{background:linear-gradient(135deg,#4aa8e0,var(--cyan));border-color:var(--gold);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 #cards{border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
-.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:3px solid var(--gold)}
+.card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:2px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
 .card.gold{background:rgba(196,146,30,.42);color:#ffe08a}
 .card.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
@@ -47,9 +47,8 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .card.savings,.e.savings{border-color:#4fd16b}
 .card.emergency,.e.emergency{border-color:#ff6b6b}
 .card.travel,.e.travel{border-color:#5aa9ff}
-.e.gold,.e.savings,.e.emergency,.e.travel{border-width:3px}
 .card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.card.sel{box-shadow:0 0 0 5px var(--gold)}
+.card.sel{box-shadow:0 0 0 4px var(--gold)}
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
 .e small{display:block;color:var(--muted);margin-top:2px}
@@ -82,6 +81,12 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 .msg{text-align:center;margin-top:10px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
 .empty{text-align:center;color:var(--muted);padding:14px;font-size:14px}
 .hide{display:none}
+.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet.hide{display:none}
+.sheet-bg{position:absolute;inset:0;background:rgba(3,8,24,.65)}
+.sheet-box{position:relative;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(180deg,#14306b,#0e2352)}
+.btn2{width:100%;margin-top:10px;padding:13px;font-size:16px;font-weight:800;border-radius:999px;border:2px solid var(--gold);background:var(--field);color:var(--ink)}
+.btn2.danger{color:var(--neg);border-color:var(--neg)}
 .foot{text-align:center;color:var(--muted);opacity:.7;font-size:12px;margin:18px 0 4px}
 #auth{display:none;text-align:center}
 #auth p{color:var(--muted);margin:10px 0 0;font-size:14px}
@@ -129,6 +134,25 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
   <img class="logo sm" src="logo.png" alt="Savings Tracker" style="margin-top:28px">
 </div>
 
+<div id="sheet" class="sheet hide">
+  <div class="sheet-bg" onclick="closeEdit()"></div>
+  <div class="panel sheet-box">
+    <div class="ph"><b>Edit entry</b><span></span></div>
+    <div class="row">
+      <div><label>Section</label><select id="e_section"></select></div>
+      <div><label>Amount (AUD)</label><input id="e_amount" type="number" inputmode="decimal" step="0.01" min="0"></div>
+    </div>
+    <label>Type</label>
+    <div class="seg"><button id="ei" class="on" onclick="setEType('Income')">Income</button><button id="ex" onclick="setEType('Expense')">Expense</button></div>
+    <label>Date</label><input id="e_date" type="date">
+    <label>Description</label><input id="e_desc" placeholder="Optional" maxlength="120">
+    <button class="save" id="e_save" onclick="saveEdit()">Save changes</button>
+    <button class="btn2 danger" onclick="delEdit()">Delete entry</button>
+    <button class="btn2" onclick="closeEdit()">Cancel</button>
+    <div class="msg" id="e_msg"></div>
+  </div>
+</div>
+
 <script src="config.js"></script>
 <script>
 const SECTIONS=['Gold','Savings','Emergency','Travel'];let entries=[],type='Income',filter=null,store=null,role='';
@@ -151,8 +175,8 @@ function render(){
   $('cards').innerHTML=SECTIONS.map(s=>`<button class="card ${s.toLowerCase()} ${filter===s?'sel':''}" onclick="toggle('${s}')"><span>${s}</span><span class="amt">${money(b[s])}</span></button>`).join('');
   const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
   if(!filter){$('ht').style.display='none';$('hist').innerHTML='';return}
-  $('ht').style.display='';$('ht').textContent=filter+' history';
-  $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span>${role==='owner'?`<button class="del" onclick="del('${e.id}')" aria-label="Delete">×</button>`:''}</div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
+  $('ht').style.display='';$('ht').textContent=filter+' history'+(role==='owner'?' · tap an entry to edit':'');
+  $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"${role==='owner'?` onclick="openEdit('${e.id}')" style="cursor:pointer"`:''}><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span></div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
   fitHist();
 }
 function toggle(s){filter=filter===s?null:s;render();$('hist').scrollTop=0}
@@ -171,7 +195,31 @@ function save(){
     setTimeout(()=>{msg('');tab(1)},500);
   }).catch(e=>{$('save').disabled=false;msg('Could not save: '+(e&&e.message||'try again'),'err')});
 }
-function del(id){if(confirm('Delete this entry?'))Promise.resolve(store.del(id)).catch(()=>alert('Could not delete'))}
+
+let editId=null,etype='Income';
+function setEType(t){etype=t;$('ei').className=t==='Income'?'on':'';$('ex').className=t==='Expense'?'on x':''}
+function openEdit(id){
+  if(role!=='owner')return;const e=entries.find(x=>x.id===id);if(!e)return;
+  editId=id;$('e_section').value=e.section;$('e_amount').value=e.amount;setEType(e.type);
+  $('e_date').value=e.date;$('e_desc').value=e.desc;$('e_msg').textContent='';$('e_msg').className='msg';
+  $('sheet').classList.remove('hide');
+}
+function closeEdit(){$('sheet').classList.add('hide');editId=null}
+function emsg(t,c){$('e_msg').textContent=t;$('e_msg').className='msg '+(c||'')}
+function saveEdit(){
+  const amount=Math.round(parseFloat($('e_amount').value)*100)/100,section=$('e_section').value,date=$('e_date').value;
+  if(!section)return emsg('Choose a section','err');
+  if(!(amount>0))return emsg('Enter an amount above 0','err');
+  if(!date)return emsg('Pick a date','err');
+  $('e_save').disabled=true;emsg('Saving…');
+  Promise.resolve(store.edit(editId,{section,type:etype,amount,date,desc:$('e_desc').value.trim()}))
+    .then(()=>{$('e_save').disabled=false;closeEdit()})
+    .catch(e=>{$('e_save').disabled=false;emsg('Could not save: '+(e&&e.message||'try again'),'err')});
+}
+function delEdit(){
+  if(!confirm('Delete this entry?'))return;
+  Promise.resolve(store.del(editId)).then(closeEdit).catch(e=>emsg('Could not delete: '+(e&&e.message||'try again'),'err'));
+}
 
 /* Storage: Google Sheets API (OAuth via Google Identity Services) */
 const C=window.APP_CONFIG,L=localStorage,enc=encodeURIComponent;
@@ -226,6 +274,13 @@ store={
     const n=FIRST+(await readRows()).length;
     await api('/values/'+enc('Entries!A'+n+':F'+n)+'?valueInputOption=USER_ENTERED',{method:'PUT',body:JSON.stringify({values:[[e.date,e.person,e.section,e.type,e.amount,e.desc]]})});
     await fetchEntries()},
+  edit:async(id,e)=>{await tok();
+    const old=entries.find(x=>x.id===id);if(!old)return;
+    const rows=await readRows(),r=rows[old.row-FIRST]||[];
+    if(String(r[2]||'').trim()!==old.section||Number(r[4])!==old.amount){await fetchEntries();throw new Error('Sheet changed, reloaded')}
+    const n=old.row;
+    await api('/values/'+enc('Entries!A'+n+':F'+n)+'?valueInputOption=USER_ENTERED',{method:'PUT',body:JSON.stringify({values:[[e.date,old.person,e.section,e.type,e.amount,e.desc]]})});
+    await fetchEntries()},
   del:async id=>{await tok();
     const old=entries.find(x=>x.id===id);if(!old)return;
     const rows=await readRows(),r=rows[old.row-FIRST]||[];
@@ -274,7 +329,7 @@ function fitHist(){
   h.style.maxHeight=(l.offsetTop+l.offsetHeight+7+4)+'px';
 }
 function init(){
-  SECTIONS.forEach(s=>$('section').add(new Option(s,s)));  $('date').value=today();render();
+  SECTIONS.forEach(s=>{$('section').add(new Option(s,s));$('e_section').add(new Option(s,s))});  $('date').value=today();render();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 }
