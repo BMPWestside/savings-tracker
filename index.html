@@ -39,15 +39,16 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 #cards .card:last-child{margin-bottom:0}
 .card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:22px 18px;border-radius:22px;margin-bottom:10px;font-weight:800;font-size:20px;border:3px solid var(--gold)}
 .card .amt{font-variant-numeric:tabular-nums}
-.card.gold{background:#f3dc8e;color:#5c3f05}
-.card.savings{background:#bfe3bf;color:#174a20}
-.card.emergency{background:#f2b8b8;color:#7a1818}
-.card.travel{background:#b4d1f5;color:#0D2A5E}
-.card.gold,.e.gold{border-color:#8a6410}
-.card.savings,.e.savings{border-color:#2d7a3b}
-.card.emergency,.e.emergency{border-color:#b02525}
-.card.travel,.e.travel{border-color:#1f5bb0}
+.card.gold{background:rgba(196,146,30,.42);color:#ffe08a}
+.card.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
+.card.emergency{background:rgba(205,45,45,.42);color:#ffb3b3}
+.card.travel{background:rgba(45,115,225,.42);color:#b3d6ff}
+.card.gold,.e.gold{border-color:#e8b84a}
+.card.savings,.e.savings{border-color:#4fd16b}
+.card.emergency,.e.emergency{border-color:#ff6b6b}
+.card.travel,.e.travel{border-color:#5aa9ff}
 .e.gold,.e.savings,.e.emergency,.e.travel{border-width:3px}
+.card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .card.sel{box-shadow:0 0 0 4px var(--cyan)}
 h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 14px;margin-bottom:8px;font-size:14px}
@@ -55,13 +56,13 @@ h3{margin:18px 6px 8px;font-size:14px;color:var(--muted);text-transform:uppercas
 #hist{position:relative;border:2px solid var(--gold);border-radius:28px;padding:12px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
 #hist .e:last-child{margin-bottom:0}
-.e.gold{background:#f3dc8e;color:#5c3f05}
-.e.savings{background:#bfe3bf;color:#174a20}
-.e.emergency{background:#f2b8b8;color:#7a1818}
-.e.travel{background:#b4d1f5;color:#0D2A5E}
+.e.gold{background:rgba(196,146,30,.42);color:#ffe08a}
+.e.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
+.e.emergency{background:rgba(205,45,45,.42);color:#ffb3b3}
+.e.travel{background:rgba(45,115,225,.42);color:#b3d6ff}
 .e.gold small,.e.savings small,.e.emergency small,.e.travel small{color:inherit;opacity:.75}
-.e.gold .inc,.e.savings .inc,.e.emergency .inc,.e.travel .inc{color:#14602a}
-.e.gold .exp,.e.savings .exp,.e.emergency .exp,.e.travel .exp{color:#a01818}
+.e.gold .inc,.e.savings .inc,.e.emergency .inc,.e.travel .inc{color:#8dffa6}
+.e.gold .exp,.e.savings .exp,.e.emergency .exp,.e.travel .exp{color:#ff9d9d}
 .e.gold .del,.e.savings .del,.e.emergency .del,.e.travel .del{color:inherit;opacity:.7}
 .inc{color:var(--pos);font-weight:800}.exp{color:var(--neg);font-weight:800}
 .del{border:0;background:none;color:var(--muted);font-size:22px;margin-left:8px;padding:0 4px}
