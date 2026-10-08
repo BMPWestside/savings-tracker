@@ -20,8 +20,9 @@
   --pos:#5fd08a;--neg:#ff8a80;
 }
 *{box-sizing:border-box}
-html{min-height:100%;background-color:#0a1330;background-image:linear-gradient(180deg,#10224f 0%,#0a1330 35%,#0a1330 100%);background-attachment:fixed;color-scheme:dark}
-body{margin:0 auto;max-width:560px;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+html{min-height:100%;background:#0a1330;color-scheme:dark}
+.logo{display:block;margin:0 auto;border-radius:22%;background:#fff;object-fit:cover}
+body{margin:0 auto;max-width:560px;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 header{margin:2px 0 8px;padding:8px 16px;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
 h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .rule{display:none}
@@ -72,6 +73,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 <body class="locked">
 <header><h1>Savings Tracker</h1><div class="rule"></div></header>
 <div id="auth" class="panel">
+  <img class="logo" src="icon-192.png" alt="" width="96" height="96" style="margin-bottom:14px">
   <b style="font-size:20px;color:#fff">Sign in</b>
   <p>Use your Google account to open the tracker.</p>
   <button class="save" id="signin" onclick="doSignIn()">Sign in with Google</button>
@@ -102,6 +104,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
     <button class="save" id="save" onclick="save()">Save entry</button>
     <div class="msg" id="msg"></div>
   </div>
+  <img class="logo" src="icon-192.png" alt="" width="72" height="72" style="margin-top:28px">
 </div>
 
 <script src="config.js"></script>
