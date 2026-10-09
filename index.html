@@ -55,7 +55,7 @@ h3{margin:10px 6px 6px;font-size:12px;color:var(--muted);text-transform:uppercas
 .e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:var(--rr,16px);padding:var(--rp,10px) 13px;margin-bottom:var(--rm,8px);font-size:var(--rf,14px)}
 .e small{display:block;color:var(--muted);margin-top:1px;font-size:var(--rs,12px)}
 #hist{position:relative;border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-#hist:empty{display:none}
+#hist.logomode{display:flex;align-items:center;justify-content:center;overflow:hidden}
 #hist .e:last-child{margin-bottom:0}
 .e.gold{background:rgba(196,146,30,.42);color:#ffe08a}
 .e.savings{background:rgba(40,150,70,.42);color:#a6f2b0}
@@ -116,8 +116,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 <div id="funds">
   <div id="cards"></div>
   <h3 id="ht">Recent entries</h3>
-  <div id="hist"></div>
-  <img id="fl" class="logo mono" src="logo-sm.png" alt="Savings Tracker" style="margin-top:10px">
+  <div id="hist"><img id="fl" class="logo mono" src="logo-sm.png" alt="Savings Tracker"><div id="hlist"></div></div>
 </div>
 
 <div id="form" class="hide">
@@ -177,9 +176,9 @@ function render(){
   const b=balances();
   $('cards').innerHTML=SECTIONS.map(s=>`<button class="card ${s.toLowerCase()} ${filter===s?'sel':''}" onclick="toggle('${s}')"><span>${s}</span><span class="amt">${money(b[s])}</span></button>`).join('');
   const list=entries.filter(e=>!filter||e.section===filter).sort((a,c)=>c.date.localeCompare(a.date)||(c.ts||0)-(a.ts||0));
-  if(!filter){$('ht').style.display='none';$('hist').innerHTML='';fitLayout();return}
+  if(!filter){$('ht').style.display='';$('ht').textContent='Tap a fund to see its history';$('hlist').innerHTML='';fitLayout();return}
   $('ht').style.display='';$('ht').textContent=filter+' history'+(role==='owner'?' · tap an entry to edit':'');
-  $('hist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"${role==='owner'?` onclick="openEdit('${e.id}')" style="cursor:pointer"`:''}><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span></div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
+  $('hlist').innerHTML=list.length?list.map(e=>`<div class="e ${e.section.toLowerCase()}"${role==='owner'?` onclick="openEdit('${e.id}')" style="cursor:pointer"`:''}><div>${e.section}${e.desc?' · '+esc(e.desc):''}<small>${fdate(e.date)}</small></div><div><span class="${e.type==='Income'?'inc':'exp'}">${e.type==='Income'?'+':'−'}${e.amount.toFixed(2)}</span></div></div>`).join(''):'<div class="empty">No entries for this fund yet.</div>';
   fitLayout();
 }
 function toggle(s){filter=filter===s?null:s;render();$('hist').scrollTop=0}
@@ -329,7 +328,20 @@ function boot(){
 }
 function reserve(){return(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))?24:72}
 function fitHist(){
-  const h=$('hist');h.style.maxHeight='';
+  const h=$('hist'),f=$('fl');
+  if($('funds').classList.contains('hide'))return;
+  h.style.height='';h.style.maxHeight='';
+  if(!filter){
+    h.classList.add('logomode');f.style.display='';f.style.height='40px';
+    const t=h.getBoundingClientRect().top+window.scrollY;
+    const boxH=Math.max(window.innerHeight-reserve()-t,120);
+    h.style.height=boxH+'px';h.style.maxHeight='none';
+    const asp=(f.naturalWidth&&f.naturalHeight)?f.naturalWidth/f.naturalHeight:0.93;
+    const size=Math.min(boxH-4-24,(h.clientWidth-24)/asp);
+    f.style.height=Math.max(size,40)+'px';
+    return;
+  }
+  h.classList.remove('logomode');f.style.display='none';
   const r=h.querySelectorAll('.e');if(!r.length||!r[0].offsetHeight)return;
   const top=h.getBoundingClientRect().top+window.scrollY;
   const avail=window.innerHeight-reserve()-top;
@@ -357,17 +369,6 @@ function fitLogo(){
     const top=g.getBoundingClientRect().top+window.scrollY;
     const size=Math.min(130,window.innerHeight-reserve()-top-6);
     if(size<44)g.style.display='none';else g.style.height=size+'px';
-  }
-  const f=$('fl');
-  if(f&&!$('funds').classList.contains('hide')){
-    if(filter){f.style.display='none';return}
-    f.style.display='';f.style.height='60px';
-    const top=f.getBoundingClientRect().top+window.scrollY;
-    const room=window.innerHeight-reserve()-top-6;
-    const aspect=(f.naturalWidth&&f.naturalHeight)?f.naturalWidth/f.naturalHeight:0.93;
-    const maxW=$('funds').getBoundingClientRect().width*0.9;
-    const size=Math.min(room,maxW/aspect);
-    if(size<60)f.style.display='none';else f.style.height=size+'px';
   }
 }
 function fitLayout(){fitHist();fitLogo()}
