@@ -52,8 +52,8 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .card,.e.gold,.e.savings,.e.emergency,.e.travel{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .card.sel{box-shadow:0 0 0 4px var(--gold)}
 h3{margin:10px 6px 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
-.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:16px;padding:10px 13px;margin-bottom:8px;font-size:14px}
-.e small{display:block;color:var(--muted);margin-top:1px;font-size:12px}
+.e{display:flex;justify-content:space-between;align-items:center;background:var(--field);border:2px solid var(--gold);border-radius:var(--rr,16px);padding:var(--rp,10px) 13px;margin-bottom:var(--rm,8px);font-size:var(--rf,14px)}
+.e small{display:block;color:var(--muted);margin-top:1px;font-size:var(--rs,12px)}
 #hist{position:relative;border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352);max-height:292px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #hist:empty{display:none}
 #hist .e:last-child{margin-bottom:0}
@@ -333,11 +333,22 @@ function fitHist(){
   const r=h.querySelectorAll('.e');if(!r.length||!r[0].offsetHeight)return;
   const top=h.getBoundingClientRect().top+window.scrollY;
   const avail=window.innerHeight-reserve()-top;
-  let k=Math.min(r.length,4);
-  const need=n=>r[n-1].offsetTop+r[n-1].offsetHeight+6+4;
-  while(k>2&&need(k)>avail)k--;
-  if(r.length>k)h.style.maxHeight=need(k)+'px';
-  else if(need(k)>avail)h.style.maxHeight=Math.max(avail,90)+'px';
+  const k=Math.min(r.length,4);
+  let curM=8;
+  const need=n=>r[n-1].offsetTop+r[n-1].offsetHeight+Math.max(1,curM-2)+4;
+  const levels=[[10,8,14,12,16],[9,7,13.5,11.5,15],[8,6,13,11,14],[7,5,12.5,10.5,13],[6,4,12,10,12],[5,3,11.5,9.5,11],[4,3,11,9,10]];
+  let used=0;
+  for(let i=0;i<levels.length;i++){
+    const L=levels[i];
+    h.style.setProperty('--rp',L[0]+'px');h.style.setProperty('--rm',L[1]+'px');
+    h.style.setProperty('--rf',L[2]+'px');h.style.setProperty('--rs',L[3]+'px');h.style.setProperty('--rr',L[4]+'px');
+    used=i;curM=L[1];
+    if(need(k)<=avail)break;
+  }
+  let kk=k;
+  while(kk>2&&need(kk)>avail)kk--;
+  if(r.length>kk)h.style.maxHeight=need(kk)+'px';
+  else if(need(kk)>avail)h.style.maxHeight=Math.max(avail,90)+'px';
 }
 function fitLogo(){
   const g=document.querySelector('#form .logo');
