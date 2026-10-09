@@ -326,7 +326,11 @@ function boot(){
   if(token)start();
   else if(email&&role){document.body.classList.remove('locked');applyRole();render();reconnectBanner()}
 }
-function reserve(){return(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))?24:72}
+function reserve(){
+  const pad=parseFloat(getComputedStyle(document.body).paddingBottom)||0;
+  const standalone=navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+  return pad+(standalone?4:50);
+}
 function fitHist(){
   const h=$('hist'),f=$('fl');
   if($('funds').classList.contains('hide'))return;
