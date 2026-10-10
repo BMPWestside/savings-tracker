@@ -83,6 +83,8 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 .msg{text-align:center;margin-top:6px;font-size:14px;font-weight:700;min-height:18px}.err{color:var(--neg)}.ok{color:var(--pos)}
 .empty{text-align:center;color:var(--muted);padding:14px;font-size:14px}
 .hide{display:none}
+.sync{margin:0 0 8px;padding:7px 12px;border-radius:999px;border:2px solid var(--gold);background:rgba(212,178,109,.18);color:var(--gold);font-size:13px;font-weight:800;text-align:center;cursor:pointer}
+.sync.hide{display:none}
 .sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(env(safe-area-inset-bottom,0px) + 12px)}
 .sheet.hide{display:none}
 .sheet-bg{position:absolute;inset:0;background:rgba(3,8,24,.65)}
@@ -114,6 +116,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </div>
 
 <div id="funds">
+  <div id="sync" class="sync hide" onclick="manualSync()">Showing saved entries · tap to refresh</div>
   <div id="cards"></div>
   <h3 id="ht">Recent entries</h3>
   <div id="hist"><img id="fl" class="logo mono" src="logo-sm.png" alt="Savings Tracker"><div id="hlist"></div></div>
@@ -269,7 +272,7 @@ async function fetchEntries(){
     if(!section||!type||!(amount>=0))return;
     entries.push({id:String(FIRST+i),row:FIRST+i,date:toISO(r[0]),person:String(r[1]||''),section,type,amount,desc:String(r[5]||''),ts:FIRST+i});
   });
-  L.setItem('st_cache',JSON.stringify(entries));render();
+  L.setItem('st_cache',JSON.stringify(entries));syncBanner(false);render();
 }
 store={
   add:async e=>{await tok();
@@ -300,7 +303,13 @@ function applyRole(){
   $('t2').classList.toggle('hide',role!=='owner');
   if(role!=='owner')tab(1);
 }
-function reconnectBanner(){$('mode').textContent='Tap to reconnect';$('mode').className='tap';$('mode').onclick=async()=>{try{await signIn();await start()}catch(e){}}}
+function syncBanner(on){const e=$('sync');if(e){e.classList.toggle('hide',!on);if(typeof fitLayout==='function')fitLayout()}}
+async function manualSync(){
+  const e=$('sync');e.textContent='Refreshing…';
+  try{await signIn();await start();e.textContent='Showing saved entries · tap to refresh'}
+  catch(x){e.textContent='Could not refresh ('+(x&&x.message||'try again')+') · tap to retry'}
+}
+function reconnectBanner(){syncBanner(true);$('mode').textContent='Tap to reconnect';$('mode').className='tap';$('mode').onclick=async()=>{try{await signIn();await start()}catch(e){}}}
 
 async function start(){
   if(!email||!role){
@@ -382,7 +391,11 @@ window.addEventListener('load',()=>setTimeout(fitLayout,100));
 ['fl'].forEach(i=>{const e=document.getElementById(i);if(e)e.addEventListener('load',fitLayout)});
 function init(){
   SECTIONS.forEach(s=>{$('section').add(new Option(s,s));$('e_section').add(new Option(s,s))});  $('date').value=today();render();
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&$('form').classList.contains('hide'))fetchEntries().catch(()=>reconnectBanner())});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden||!$('form').classList.contains('hide'))return;
+    if(token&&role)fetchEntries().catch(()=>reconnectBanner());
+    else if(email&&role){reconnectBanner();signIn().then(()=>start()).catch(()=>{})}
+  });
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 }
 init();
