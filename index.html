@@ -26,7 +26,7 @@ html{min-height:100%;background:#0a1330;color-scheme:dark}
 .logo.mono{width:auto;max-width:100%;height:130px}
 html,body{overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
 .top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0a1330 0,#0a1330 calc(100% - 12px),rgba(10,19,48,0) 100%);padding:calc(env(safe-area-inset-top,0px) + 44px) 16px 12px;margin:0 -16px}
-body{margin:0 auto;max-width:560px;min-height:100vh;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{margin:0 auto;max-width:560px;min-height:0;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 24px);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 header{margin:0 0 8px;padding:5px 7px;display:grid;grid-template-columns:34px 1fr 34px;align-items:center;text-align:center;border-radius:999px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--cobalt),#2a509a);box-shadow:0 6px 16px rgba(0,0,0,.45)}
 h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#fff}
 .pb{width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;letter-spacing:.5px;color:var(--gold);background:rgba(13,42,94,.55);opacity:.32;transition:opacity .25s,box-shadow .25s,background .25s}
@@ -115,7 +115,8 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 #mode.tap{cursor:pointer;color:var(--gold);text-decoration:underline}
 
 /* ---------- glass + glow theme ---------- */
-.sumbar{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:8px;padding:8px 10px;border:2px solid rgba(212,178,109,.75);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:min(10px,2.4vw);white-space:nowrap}.sumbar.hide{display:none}.sumbar span{display:flex;gap:3px;align-items:baseline}.sumbar b{color:#fff;font-weight:800}.sumbar i{font-style:normal;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}.sumbar span:last-child i{color:#7ee2a0}.sumbar u{width:2px;height:16px;border-radius:2px;background:var(--gold);opacity:.9;text-decoration:none}
+@media (orientation:portrait){html,body{overflow:hidden}}
+.sumbar{display:flex;align-items:stretch;margin-bottom:8px;padding:5px 0;border:2px solid rgba(212,178,109,.75);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}.sumbar.hide{display:none}.sumbar span{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0 2px;line-height:1.15}.sumbar span+span{border-left:2px solid var(--gold)}.sumbar b{color:#fff;font-weight:800;font-size:10px;letter-spacing:.3px;text-transform:uppercase;opacity:.9}.sumbar i{font-style:normal;font-weight:800;color:var(--gold2);font-size:min(12.5px,3.2vw);font-variant-numeric:tabular-nums;white-space:nowrap}.sumbar span:last-child i{color:#7ee2a0}
 html{background:#070e26;background-image:radial-gradient(60% 40% at 15% 8%,rgba(31,166,224,.28),transparent 70%),radial-gradient(55% 40% at 90% 40%,rgba(212,178,109,.20),transparent 70%),radial-gradient(70% 45% at 30% 100%,rgba(120,80,220,.25),transparent 70%);background-attachment:fixed}
 .top{background:none}
 header,.tabs,#cards,#hist,.panel,.sr,.sheet .panel{-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
@@ -141,7 +142,7 @@ input,select,.seg button{background:rgba(255,255,255,.07)}
   <button id="m1" class="on" onclick="setApp('sav')">Savings</button>
   <button id="m2" onclick="setApp('inv')">Investments</button>
 </div>
-<div class="sumbar hide" id="sb"><span><b>Invested:</b> <i id="s_inv">A$0</i></span><u></u><span><b>Share:</b> <i id="s_share">A$0</i></span><u></u><span><b>Profit:</b> <i id="s_profit">A$0</i></span></div>
+<div class="sumbar hide" id="sb"><span><b>Invested</b><i id="s_inv">A$0</i></span><span><b>Share</b><i id="s_share">A$0</i></span><span><b>Profit</b><i id="s_profit">A$0</i></span></div>
 <div class="tabs sub" id="st">
   <button id="t1" class="on" onclick="tab(1)">Stack</button>
   <button id="t2" onclick="tab(2)">Add</button>
