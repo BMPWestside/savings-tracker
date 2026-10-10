@@ -115,7 +115,7 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 #mode.tap{cursor:pointer;color:var(--gold);text-decoration:underline}
 
 /* ---------- glass + glow theme ---------- */
-.sumbar{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding:7px 12px;border:2px solid rgba(212,178,109,.75);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:12.5px;white-space:nowrap}.sumbar.hide{display:none}.sumbar span{display:flex;gap:5px;align-items:baseline}.sumbar b{color:#fff;font-weight:800}.sumbar i{font-style:normal;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}.sumbar u{width:2px;height:16px;border-radius:2px;background:var(--gold);opacity:.9;text-decoration:none}
+.sumbar{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:8px;padding:8px 10px;border:2px solid rgba(212,178,109,.75);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font-size:min(10px,2.4vw);white-space:nowrap}.sumbar.hide{display:none}.sumbar span{display:flex;gap:3px;align-items:baseline}.sumbar b{color:#fff;font-weight:800}.sumbar i{font-style:normal;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}.sumbar span:last-child i{color:#7ee2a0}.sumbar u{width:2px;height:16px;border-radius:2px;background:var(--gold);opacity:.9;text-decoration:none}
 html{background:#070e26;background-image:radial-gradient(60% 40% at 15% 8%,rgba(31,166,224,.28),transparent 70%),radial-gradient(55% 40% at 90% 40%,rgba(212,178,109,.20),transparent 70%),radial-gradient(70% 45% at 30% 100%,rgba(120,80,220,.25),transparent 70%);background-attachment:fixed}
 .top{background:none}
 header,.tabs,#cards,#hist,.panel,.sr,.sheet .panel{-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
@@ -141,7 +141,7 @@ input,select,.seg button{background:rgba(255,255,255,.07)}
   <button id="m1" class="on" onclick="setApp('sav')">Savings</button>
   <button id="m2" onclick="setApp('inv')">Investments</button>
 </div>
-<div class="sumbar hide" id="sb"><span><b>Invested</b> <i id="s_inv">A$0</i></span><u></u><span><b>Share</b> <i id="s_share">A$0</i></span><u></u><span><b>Profit</b> <i id="s_profit">A$0</i></span></div>
+<div class="sumbar hide" id="sb"><span><b>Invested:</b> <i id="s_inv">A$0</i></span><u></u><span><b>Share:</b> <i id="s_share">A$0</i></span><u></u><span><b>Profit:</b> <i id="s_profit">A$0</i></span></div>
 <div class="tabs sub" id="st">
   <button id="t1" class="on" onclick="tab(1)">Stack</button>
   <button id="t2" onclick="tab(2)">Add</button>
@@ -350,8 +350,8 @@ function renderInv(){
     $('ht').textContent='';$('hlist').innerHTML='';ifilter=null;fitLayout();return;
   }
   const g=aggregate();
-  $('s_inv').textContent='A$'+kf(g.ti);$('s_profit').textContent='A$'+kf(g.tp);
-  $('s_share').textContent='A$'+kf(iproj.reduce((t,p)=>t+(Number(p.share)||0),0));
+  $('s_inv').textContent='A$'+fm(g.ti);$('s_profit').textContent='A$'+fm(g.tp);
+  $('s_share').textContent='A$'+fm(iproj.reduce((t,p)=>t+(Number(p.share)||0),0));
   $('cards').innerHTML=iproj.map((p,i)=>{const a=g.m[p.name]||{inv:0,profit:0};
       return `<button class="card p ${PCOL[i%PCOL.length]} ${ifilter===p.name?'sel':''}" onclick="toggleP(${i})"><span class="cn"><b>${esc(shortName(p.name))}</b><small>${esc(bracket(p.name)||('Share A$'+fm(p.share)))}</small></span><span class="rt"><b>A$${fm(a.inv)}</b>${a.profit?`<small>Profit A$${fm(a.profit)}</small>`:''}</span></button>`}).join('');
   if(!ifilter){$('ht').textContent='Tap a project to see its history';$('hlist').innerHTML='';fitLayout();return}
