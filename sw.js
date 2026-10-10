@@ -1,4 +1,4 @@
-const CACHE = 'savings-tracker-v2';
+const CACHE = 'family-vault-v3';
 const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'logo.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
