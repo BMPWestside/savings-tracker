@@ -40,7 +40,7 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs button.hide{display:none}
 #cards{border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
-@media (max-height:700px){#formI input,#formI select{height:36px}#formI label{margin:4px 6px 2px;font-size:13px}#formI .panel{padding:10px 12px}#formI .seg button{padding:7px 2px}#formI .save{padding:10px}#formI .ph{margin-bottom:2px}}
+@media (max-height:700px){.top{padding-top:calc(env(safe-area-inset-top,0px) + 24px)}.tabs{margin-bottom:6px}#formI input,#formI select{height:36px}#formI label{margin:4px 6px 2px;font-size:13px}#formI .panel{padding:10px 12px}#formI .seg button{padding:7px 2px}#formI .save{padding:10px}#formI .ph{margin-bottom:2px}}
 .sum{padding:14px}.sr{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;margin-bottom:10px;border:2px solid var(--gold);border-radius:20px;background:rgba(74,168,224,.14);font-size:19px;font-weight:800;color:var(--muted)}.sr b{color:#fff;font-size:22px;font-variant-numeric:tabular-nums}.sr.pr b{color:#7ee2a0}.sum .logo{display:block;margin:6px auto 0}
 .tot{display:flex;justify-content:space-between;gap:8px;padding:0 6px 6px;font-size:12px;font-weight:700;color:var(--muted)}
 .tot b{color:#fff}
@@ -114,6 +114,24 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 .locked #auth{display:block}
 .locked .tabs,.locked #funds,.locked #form,.locked #formI{display:none}
 #mode.tap{cursor:pointer;color:var(--gold);text-decoration:underline}
+
+/* ---------- glass + glow theme ---------- */
+html{background:#070e26;background-image:radial-gradient(60% 40% at 15% 8%,rgba(31,166,224,.28),transparent 70%),radial-gradient(55% 40% at 90% 40%,rgba(212,178,109,.20),transparent 70%),radial-gradient(70% 45% at 30% 100%,rgba(120,80,220,.25),transparent 70%);background-attachment:fixed}
+.top{background:none}
+header,.tabs,#cards,#hist,.panel,.sr,.sheet .panel{-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
+header{background:linear-gradient(135deg,rgba(13,42,94,.45),rgba(42,80,154,.35));border-color:rgba(212,178,109,.8);box-shadow:0 0 14px rgba(212,178,109,.25),inset 0 1px 0 rgba(255,255,255,.18)}
+.tabs{background:rgba(255,255,255,.06);border-color:rgba(212,178,109,.75);box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+#cards,#hist,.panel{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));border-color:rgba(212,178,109,.8);box-shadow:0 8px 24px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.18)}
+.sr{background:rgba(255,255,255,.07)}
+.e{background:rgba(255,255,255,.07);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.card.gold,.e.gold{background:rgba(196,146,30,.30)}.card.savings,.e.savings{background:rgba(40,150,70,.30)}.card.emergency,.e.emergency{background:rgba(205,45,45,.30)}.card.travel,.e.travel{background:rgba(45,115,225,.30)}.card.violet,.e.violet{background:rgba(140,80,220,.30)}
+input,select,.seg button{background:rgba(255,255,255,.07)}
+.tabs button.on,.seg button.on,.seg button.on.x{background:linear-gradient(135deg,rgba(74,168,224,.75),rgba(31,166,224,.6));border-color:var(--gold);box-shadow:0 0 12px 2px rgba(31,166,224,.75),0 0 26px rgba(31,166,224,.45),inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 0 8px rgba(255,255,255,.7)}
+.seg button.on.x{background:linear-gradient(135deg,rgba(255,110,110,.7),rgba(220,70,70,.55));box-shadow:0 0 12px 2px rgba(255,100,100,.7),0 0 26px rgba(255,100,100,.4)}
+.pb.on{box-shadow:0 0 12px 3px rgba(212,178,109,.8),0 0 26px rgba(212,178,109,.45)}
+.card.sel{box-shadow:0 0 0 4px var(--gold),0 0 22px 4px rgba(212,178,109,.65)}
+.card.gold.sel{box-shadow:0 0 0 4px var(--gold),0 0 22px 4px rgba(232,184,74,.7)}
+.save{box-shadow:0 0 14px rgba(212,178,109,.5)}
 </style>
 </head>
 <body class="locked">
@@ -123,9 +141,11 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
   <button id="m1" class="on" onclick="setApp('sav')">Savings</button>
   <button id="m2" onclick="setApp('inv')">Investments</button>
 </div>
+<div class="tabs sub hide" id="st0">
+  <button id="t3" onclick="tab(3)">Invested</button>
+</div>
 <div class="tabs sub" id="st">
   <button id="t1" class="on" onclick="tab(1)">Stack</button>
-  <button id="t3" class="hide" onclick="tab(3)">Invested</button>
   <button id="t2" onclick="tab(2)">Add</button>
 </div>
 </div>
@@ -264,7 +284,7 @@ function tab(n){
 function setApp(a){
   app=a;
   $('m1').classList.toggle('on',a==='sav');$('m2').classList.toggle('on',a==='inv');
-  $('t1').textContent=a==='sav'?'Stack':'Build';$('t3').classList.toggle('hide',a!=='inv');
+  $('t1').textContent=a==='sav'?'Stack':'Build';$('st0').classList.toggle('hide',a!=='inv');
   updateSync();render();tab(1);
 }
 function setType(t){type=t;$('bi').className=t==='Income'?'on':'';$('bx').className=t==='Expense'?'on x':''}
