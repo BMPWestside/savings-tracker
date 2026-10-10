@@ -40,6 +40,8 @@ h1{margin:0;font-size:18px;font-weight:900;letter-spacing:1px;text-transform:upp
 .tabs button.hide{display:none}
 #cards{border:2px solid var(--gold);border-radius:24px;padding:8px;background:linear-gradient(180deg,#14306b,#0e2352)}
 #cards .card:last-child{margin-bottom:0}
+@media (max-height:700px){#formI input,#formI select{height:36px}#formI label{margin:4px 6px 2px;font-size:13px}#formI .panel{padding:10px 12px}#formI .seg button{padding:7px 2px}#formI .save{padding:10px}#formI .ph{margin-bottom:2px}}
+.sum{padding:14px}.sr{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;margin-bottom:10px;border:2px solid var(--gold);border-radius:20px;background:rgba(74,168,224,.14);font-size:19px;font-weight:800;color:var(--muted)}.sr b{color:#fff;font-size:22px;font-variant-numeric:tabular-nums}.sr.pr b{color:#7ee2a0}.sum .logo{display:block;margin:6px auto 0}
 .tot{display:flex;justify-content:space-between;gap:8px;padding:0 6px 6px;font-size:12px;font-weight:700;color:var(--muted)}
 .tot b{color:#fff}
 .card{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:var(--cp,15px) 16px;border-radius:20px;margin-bottom:var(--cm,8px);font-weight:800;font-size:19px;border:2px solid var(--gold)}
@@ -123,7 +125,8 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
 </div>
 <div class="tabs sub" id="st">
   <button id="t1" class="on" onclick="tab(1)">Stack</button>
-  <button id="t2" onclick="tab(2)">New Entry</button>
+  <button id="t3" class="hide" onclick="tab(3)">Invested</button>
+  <button id="t2" onclick="tab(2)">Add</button>
 </div>
 </div>
 <div id="auth" class="panel">
@@ -139,6 +142,15 @@ input:focus,select:focus{outline:3px solid var(--cyan)}
   <div id="cards"></div>
   <h3 id="ht">Recent entries</h3>
   <div id="hist"><img id="fl" class="logo mono" src="logo-sm.png" alt="Family Vault"><div id="hlist"></div></div>
+</div>
+
+<div id="sumI" class="hide">
+  <div class="panel sum">
+    <div class="sr"><span>Invested</span><b id="s_inv">A$0.00</b></div>
+    <div class="sr"><span>Share</span><b id="s_share">A$0.00</b></div>
+    <div class="sr pr"><span>Profit</span><b id="s_profit">A$0.00</b></div>
+    <img class="logo mono" src="logo-sm.png" alt="Family Vault">
+  </div>
 </div>
 
 <div id="form" class="hide">
@@ -242,8 +254,9 @@ const bracket=s=>{const m=String(s).match(/\((.*)\)\s*$/);return m?m[1]:''};
 /* ---------- navigation ---------- */
 function tab(n){
   sub=n;
-  $('t1').classList.toggle('on',n===1);$('t2').classList.toggle('on',n===2);
+  $('t1').classList.toggle('on',n===1);$('t2').classList.toggle('on',n===2);$('t3').classList.toggle('on',n===3);
   $('funds').classList.toggle('hide',n!==1);
+  $('sumI').classList.toggle('hide',!(n===3&&app==='inv'));
   $('form').classList.toggle('hide',!(n===2&&app==='sav'));
   $('formI').classList.toggle('hide',!(n===2&&app==='inv'));
   fitLayout();
@@ -251,7 +264,7 @@ function tab(n){
 function setApp(a){
   app=a;
   $('m1').classList.toggle('on',a==='sav');$('m2').classList.toggle('on',a==='inv');
-  $('t1').textContent=a==='sav'?'Stack':'Build';
+  $('t1').textContent=a==='sav'?'Stack':'Build';$('t3').classList.toggle('hide',a!=='inv');
   updateSync();render();tab(1);
 }
 function setType(t){type=t;$('bi').className=t==='Income'?'on':'';$('bx').className=t==='Expense'?'on x':''}
@@ -328,8 +341,9 @@ function renderInv(){
     $('ht').textContent='';$('hlist').innerHTML='';ifilter=null;fitLayout();return;
   }
   const g=aggregate();
-  $('cards').innerHTML=`<div class="tot"><span>Total invested <b>A$${fm(g.ti)}</b></span><span>Profit <b>A$${fm(g.tp)}</b></span></div>`+
-    iproj.map((p,i)=>{const a=g.m[p.name]||{inv:0,profit:0};
+  $('s_inv').textContent='A$'+fm(g.ti);$('s_profit').textContent='A$'+fm(g.tp);
+  $('s_share').textContent='A$'+fm(iproj.reduce((t,p)=>t+(Number(p.share)||0),0));
+  $('cards').innerHTML=iproj.map((p,i)=>{const a=g.m[p.name]||{inv:0,profit:0};
       return `<button class="card p ${PCOL[i%PCOL.length]} ${ifilter===p.name?'sel':''}" onclick="toggleP(${i})"><span class="cn"><b>${esc(shortName(p.name))}</b><small>${esc(bracket(p.name)||('Share A$'+fm(p.share)))}</small></span><span class="rt"><b>A$${fm(a.inv)}</b>${a.profit?`<small>Profit A$${fm(a.profit)}</small>`:''}</span></button>`}).join('');
   if(!ifilter){$('ht').textContent='Tap a project to see its history';$('hlist').innerHTML='';fitLayout();return}
   const pi=iproj.findIndex(p=>p.name===ifilter),p=iproj[pi]||{share:0};
@@ -615,16 +629,25 @@ function fitHist(){
   else if(need(kk)>av)h.style.maxHeight=Math.max(av,90)+'px';
 }
 function fitLogo(){
-  const box=$(app==='sav'?'form':'formI');
+  const box=['form','formI'].map($).find(b=>b&&!b.classList.contains('hide'));
   const g=box&&box.querySelector('.logo');
-  if(g&&!box.classList.contains('hide')){
+  if(g){
     g.style.display='';g.style.height='130px';
     const top=g.getBoundingClientRect().top+window.scrollY;
     const size=Math.min(130,window.innerHeight-reserve()-top-6);
     if(size<44)g.style.display='none';else g.style.height=size+'px';
   }
 }
-function fitLayout(){fitHist();fitLogo()}
+function fitSum(){
+  const p=document.querySelector('#sumI .panel');if(!p||$('sumI').classList.contains('hide'))return;
+  p.style.height='';const g=p.querySelector('.logo');g.style.display='';g.style.height='60px';
+  const top=p.getBoundingClientRect().top+window.scrollY;
+  const h=window.innerHeight-reserve()-top;p.style.height=h+'px';p.style.boxSizing='border-box';
+  const used=[...p.querySelectorAll('.sr')].reduce((t,e)=>t+e.offsetHeight+10,0)+28;
+  const size=Math.min(h-used-12,(p.clientWidth-28)/0.93);
+  if(size<44)g.style.display='none';else g.style.height=size+'px';
+}
+function fitLayout(){fitHist();fitLogo();fitSum()}
 window.addEventListener('resize',fitLayout);
 window.addEventListener('orientationchange',()=>setTimeout(fitLayout,200));
 window.addEventListener('load',()=>setTimeout(fitLayout,100));
@@ -637,7 +660,7 @@ function init(){
   $('date').value=today();$('i_date').value=today();
   render();
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden||sub!==1)return;
+    if(document.hidden||sub===2)return;
     if(token&&role){fetchEntries().catch(e=>setStale('sav',true,errText(e)));loadInv()}
     else if(email&&role){reconnectBanner();signIn().then(()=>start()).catch(()=>{})}
   });
